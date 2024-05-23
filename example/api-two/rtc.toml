@@ -1,0 +1,4 @@
+[key_value_store.default]
+type = "redis"
+url = "redis://localhost:54161"
+
