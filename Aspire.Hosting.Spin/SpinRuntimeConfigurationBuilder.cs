@@ -3,33 +3,33 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Aspire.Hosting;
 
-public class RuntimeConfigurationBuilder
+public class SpinRuntimeConfigurationBuilder
 {
 
     private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _keyValueStores;
     private IDictionary<string, string> _sqliteDatabases;
     private string _name;
 
-    private RuntimeConfigurationBuilder()
+    private SpinRuntimeConfigurationBuilder()
     {
         _keyValueStores = new Dictionary<string, IResourceBuilder<IResourceWithConnectionString>>();
         _sqliteDatabases = new Dictionary<string, string>();
     }
-    public static RuntimeConfigurationBuilder Create(string fileName)
+    public static SpinRuntimeConfigurationBuilder Create(string fileName)
     {
-        return new RuntimeConfigurationBuilder()
+        return new SpinRuntimeConfigurationBuilder()
         {
             _name = fileName
         };
     }
     
-    public RuntimeConfigurationBuilder WithRedisKeyValueStore(string name, IResourceBuilder<IResourceWithConnectionString> source)
+    public SpinRuntimeConfigurationBuilder WithRedisKeyValueStore(string name, IResourceBuilder<IResourceWithConnectionString> source)
     {
         _keyValueStores.Add(name, source);
         return this;
     }
 
-    public RuntimeConfigurationBuilder WithSqliteDatabase(string name, string path)
+    public SpinRuntimeConfigurationBuilder WithSqliteDatabase(string name, string path)
     {
         _sqliteDatabases.Add(name, path);
         return this;

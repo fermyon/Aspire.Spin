@@ -1,12 +1,12 @@
 namespace Aspire.Hosting;
 
-public class OCIReference(string repository, string tag)
+public class OciReference(string repository, string tag)
 {
     public const string Latest = "latest";
 
-    public static OCIReference From(string repository, string tag)
+    public static OciReference From(string repository, string tag)
     {
-        return new OCIReference(repository, tag);
+        return new OciReference(repository, tag);
     }
     
     public String Repository { get; } = repository;

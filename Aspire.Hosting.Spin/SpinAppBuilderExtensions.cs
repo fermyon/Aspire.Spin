@@ -2,15 +2,16 @@ using Aspire.Hosting.ApplicationModel;
 
 namespace Aspire.Hosting;
 
-public static class SpinAppHostingExtension
+public static class SpinAppBuilderExtensions
 {
 
     private static IResourceBuilder<SpinAppResource> BuildSpinAppResource(this IDistributedApplicationBuilder builder, string name, string workingDirectory,
-        string[] args)
+        int port, string[] args)
     {
         var resource = new SpinAppResource(name, workingDirectory);
         
         return builder.AddResource(resource)
+            .WithEndpoint(port: port, targetPort: port, scheme: "http", isProxied: false)
             .WithUp()
             .WithSpinDefaults()
             .WithArgs(args);
@@ -20,7 +21,7 @@ public static class SpinAppHostingExtension
     {
         string[] effectiveArgs = BuildListenArgs(port);
         workingDirectory = Path.Combine(builder.AppHostDirectory, workingDirectory);
-        return builder.BuildSpinAppResource(name, workingDirectory, effectiveArgs);
+        return builder.BuildSpinAppResource(name, workingDirectory, port, effectiveArgs);
     }
 
     private static string[] BuildListenArgs(int port)
@@ -28,15 +29,15 @@ public static class SpinAppHostingExtension
         return [Constants.SpinFlags.Listen, $"127.0.0.1:{port}"];
     }
 
-    private static String[] BuildOciArgs(OCIReference oci)
+    private static String[] BuildOciArgs(OciReference oci)
     {
         return [Constants.SpinFlags.From, oci.ToString()];
     }
     
-    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name, OCIReference oci, int port = 3000)
+    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name, OciReference oci, int port = 3000)
     {
         string[] args = BuildListenArgs(port).Concat(BuildOciArgs(oci)).ToArray();
-        return builder.BuildSpinAppResource(name, string.Empty, args);
+        return builder.BuildSpinAppResource(name, string.Empty, port, args);
     }
 
     private static IResourceBuilder<SpinAppResource> WithUp(this IResourceBuilder<SpinAppResource> builder)
@@ -75,12 +76,12 @@ public static class SpinAppHostingExtension
         });
     }
 
-    public static IResourceBuilder<SpinAppResource> WithRuntimeConfig(this IResourceBuilder<SpinAppResource> builder, RuntimeConfigurationBuilder runtimeConfigBuilder)
+    public static IResourceBuilder<SpinAppResource> WithRuntimeConfig(this IResourceBuilder<SpinAppResource> builder, SpinRuntimeConfigurationBuilder spinRuntimeConfigBuilder)
     {
         
         return builder.WithArgs(async (ctx) =>
         {
-            var config = await runtimeConfigBuilder.Build();
+            var config = await spinRuntimeConfigBuilder.Build();
             var runtimeConfigFile = Path.Combine(builder.ApplicationBuilder.AppHostDirectory, builder.Resource.WorkingDirectory, config.Name);
             await File.WriteAllTextAsync(runtimeConfigFile, config.ToToml());
             ctx.Args.Add(Constants.SpinFlags.RuntimeConfigFile);

@@ -4,9 +4,9 @@ using Aspire.Hosting.ApplicationModel;
 namespace Aspire.Hosting;
 
 public class SpinRegistryLogin: Lifecycle.IDistributedApplicationLifecycleHook {
-    private readonly OCICredentials _creds;
+    private readonly OciRegistryCredentials _creds;
 
-    public SpinRegistryLogin(OCICredentials creds)
+    public SpinRegistryLogin(OciRegistryCredentials creds)
     {
         _creds = creds;
     }
