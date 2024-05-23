@@ -21,7 +21,7 @@ public class SpinRegistryLogin: Lifecycle.IDistributedApplicationLifecycleHook {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = Constants.SpinBinary,
-                    Arguments = $"registry login {_creds.LoginServer} -u {_creds.User} -p {_creds.Password}",
+                    Arguments = $"{Constants.SpinCommands.Registry} {Constants.SpinCommands.Login} {_creds.LoginServer} -u {_creds.User} -p {_creds.Password}",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,

@@ -61,28 +61,28 @@ public static class SpinAppHostingExtension
     
     public static IResourceBuilder<SpinAppResource> WithReference(this IResourceBuilder<SpinAppResource> builder, IResourceBuilder<IResourceWithConnectionString> source, string? connectionName = null, bool optional = false)
     {
-        string connectionName2 = connectionName;
+        var name = connectionName;
         IResourceWithConnectionString resource = source.Resource;
-        if (connectionName2 == null)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            connectionName2 = resource.Name;
+            name = resource.Name;
         }
 
         return builder.WithEnvironment(delegate (EnvironmentCallbackContext context)
         {
-            var key = resource.ConnectionStringEnvironmentVariable ?? (Constants.SpinVariablePrefix + "ConnectionStrings__" + connectionName2);
+            var key = resource.ConnectionStringEnvironmentVariable ?? (Constants.SpinVariablePrefix + "ConnectionStrings__" + name);
             context.EnvironmentVariables[key] = new ConnectionStringReference(resource, optional);
         });
     }
 
     public static IResourceBuilder<SpinAppResource> WithRuntimeConfig(this IResourceBuilder<SpinAppResource> builder, RuntimeConfigurationBuilder runtimeConfigBuilder)
     {
-        var runtimeConfigFile = Path.Combine(builder.ApplicationBuilder.AppHostDirectory, builder.Resource.WorkingDirectory, ".az.toml");
         
         return builder.WithArgs(async (ctx) =>
         {
             var config = await runtimeConfigBuilder.Build();
-            File.WriteAllText(runtimeConfigFile, config.ToToml());
+            var runtimeConfigFile = Path.Combine(builder.ApplicationBuilder.AppHostDirectory, builder.Resource.WorkingDirectory, config.Name);
+            await File.WriteAllTextAsync(runtimeConfigFile, config.ToToml());
             ctx.Args.Add(Constants.SpinFlags.RuntimeConfigFile);
             ctx.Args.Add(runtimeConfigFile);
         });

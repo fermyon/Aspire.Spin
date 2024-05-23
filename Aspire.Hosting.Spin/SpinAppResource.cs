@@ -2,27 +2,19 @@
 using Aspire.Hosting.Utils;
 namespace Aspire.Hosting;
 
-public enum SpinAppKind
-{
-    Http,
-    StaticFileServer
-}
-
 public class SpinAppResource : ExecutableResource
 {
     
     public SpinAppResource(string name, string workingDirectory)
-        : this(name, Constants.SpinBinary, workingDirectory, SpinAppKind.Http)
+        : this(name, Constants.SpinBinary, workingDirectory)
     {
 
     }
 
-    internal SpinAppResource(string name, string command, string workingDirectory, SpinAppKind kind)
+    internal SpinAppResource(string name, string command, string workingDirectory)
         : base(name, command, workingDirectory)
     {
-        Kind = kind;
-    }
-    public SpinAppKind Kind { get; private set; }
 
+    }
 
 }

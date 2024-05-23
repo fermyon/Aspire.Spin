@@ -8,16 +8,21 @@ public class RuntimeConfigurationBuilder
 
     private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _keyValueStores;
     private IDictionary<string, string> _sqliteDatabases;
+    private string _name;
 
     private RuntimeConfigurationBuilder()
     {
         _keyValueStores = new Dictionary<string, IResourceBuilder<IResourceWithConnectionString>>();
         _sqliteDatabases = new Dictionary<string, string>();
     }
-    public static RuntimeConfigurationBuilder Create()
+    public static RuntimeConfigurationBuilder Create(string fileName)
     {
-        return new RuntimeConfigurationBuilder();
+        return new RuntimeConfigurationBuilder()
+        {
+            _name = fileName
+        };
     }
+    
     public RuntimeConfigurationBuilder WithRedisKeyValueStore(string name, IResourceBuilder<IResourceWithConnectionString> source)
     {
         _keyValueStores.Add(name, source);
@@ -33,7 +38,7 @@ public class RuntimeConfigurationBuilder
 
     public async Task<RuntimeConfiguration> Build()
     {
-        var cfg = new RuntimeConfiguration();
+        var cfg = new RuntimeConfiguration(_name);
         foreach (var kv in _keyValueStores)
         {
             var url = await kv.Value.Resource.GetValueAsync();

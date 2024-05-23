@@ -8,6 +8,9 @@ public class Constants
     {
         public const string Up = "up";
         public const string Registry = "registry";
+        public const string Login = "login";
+        public const string Plugins = "plugins";
+        public const string Install = "install";
     }
 
     public static class SpinFlags
@@ -21,5 +24,7 @@ public class Constants
         public const string RuntimeConfigFile = "--runtime-config-file";
         public const string Version = "--version";
         public const string Listen = "--listen";
+        public const string Confirm = "--yes";
+
     }
 }

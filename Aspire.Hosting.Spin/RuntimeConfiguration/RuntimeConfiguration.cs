@@ -7,8 +7,10 @@ namespace Aspire.Hosting;
 // hack: simple dump of runtime configuration
 public class RuntimeConfiguration : ITomlize
 {
-    internal RuntimeConfiguration()
+    
+    internal RuntimeConfiguration(string name)
     {
+        Name  = name;
         KeyValueStores = new Dictionary<string, KeyValueStore>();
         SqliteDatabases = new Dictionary<string, SqliteDatabase>();
     }
@@ -17,6 +19,7 @@ public class RuntimeConfiguration : ITomlize
     public IDictionary<string, KeyValueStore> KeyValueStores { get; set; }
     public IDictionary<string, SqliteDatabase> SqliteDatabases { get; set; }
 
+    public string Name { get; private set; }
     public string ToToml()
     {
         var builder = new StringBuilder();
