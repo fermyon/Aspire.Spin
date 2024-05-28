@@ -29,6 +29,8 @@ jobs:
       - name: Build Aspire.Hosting.Spin
         run: dotnet build --configuration Release
         working-directory: ./Aspire.Hosting.Spin
+      - name: Install .NET Aspire Workload
+        run: dotnet workload install aspire
       - name: Build Sample Application
         run: dotnet build --configuration Release
         working-directory: ./example/host
