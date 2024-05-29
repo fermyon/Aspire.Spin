@@ -7,7 +7,7 @@ The project is under active development, so no guarantees of stability or compat
 ## Installation
 
 ```bash
-# Add Aspire.Hosting.Spin to your .NET Aspire project
+# Add Fermyon.Aspire.Spin to your .NET Aspire project
 dotnet add package Fermyon.Aspire.Spin
 ```
 
