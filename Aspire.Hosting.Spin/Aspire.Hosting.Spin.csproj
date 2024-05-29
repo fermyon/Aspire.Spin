@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <Product>Fermyon.Aspire.Hosting.Spin</Product>
-        <PackageId>Fermyon.Aspire.Hosting.Spin</PackageId>
+        <Product>Fermyon.Aspire.Spin</Product>
+        <PackageId>Fermyon.Aspire.Spin</PackageId>
         <Authors>Fermyon Technologies</Authors>
         <Company>Fermyon Technologies</Company>
         <TargetFramework>net8.0</TargetFramework>
