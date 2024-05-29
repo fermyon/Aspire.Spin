@@ -9,7 +9,7 @@ public class SpinRuntimeConfigurationBuilder
     private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _aspireKeyValueStores;
     private IDictionary<string, string> _keyValueStores;
     private IDictionary<string, string> _sqliteDatabases;
-    private string _name;
+    private string _name = null!;
 
     private SpinRuntimeConfigurationBuilder()
     {

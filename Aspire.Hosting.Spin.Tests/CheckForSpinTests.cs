@@ -1,4 +1,6 @@
+using Aspire.Hosting.ApplicationModel;
 using FluentAssertions;
+using Moq;
 
 namespace Aspire.Hosting.Spin.Tests;
 
@@ -7,16 +9,9 @@ public class CheckForSpinTests
     
     bool IsSpinInPath()
     {
-        var paths = Environment.GetEnvironmentVariable("PATH").Split(Path.PathSeparator);
-        foreach (var path in paths)
-        {
-            var fullPath = Path.Combine(path, "spin");
-            if (File.Exists(fullPath))
-            {
-                return true;
-            }
-        }
-        return false;
+        var paths = Environment.GetEnvironmentVariable("PATH")!.Split(Path.PathSeparator);
+        return paths.Select(path => Path.Combine(path, "spin"))
+            .Any(fullPath => File.Exists(fullPath));
     }
 
     [SkippableFact]
@@ -24,7 +19,7 @@ public class CheckForSpinTests
     {
         Skip.IfNot(IsSpinInPath());
         var sut = new CheckForSpin();
-        var act = () => sut.BeforeStartAsync(null);
+        var act = () => sut.BeforeStartAsync(null!);
         
         await act.Should().NotThrowAsync();
     }
@@ -33,8 +28,9 @@ public class CheckForSpinTests
     public async Task ItShouldFailIfSpinIsNotInstalled()
     {
         Skip.If(IsSpinInPath());
+        
         var sut = new CheckForSpin();
-        var act = () => sut.BeforeStartAsync(null);
+        var act = () => sut.BeforeStartAsync(null!);
         
         await act.Should().ThrowAsync<Exception>();
     }

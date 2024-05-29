@@ -10,13 +10,18 @@ public class SpinKeyValueStore : KeyValueStore, IEquatable<SpinKeyValueStore>
         Path = path;
     }
 
-    public string Path { get; private set; }
+    public string Path { get; }
 
     public override string ToToml()
     {
         var builder = new StringBuilder(base.ToToml());
         builder.AppendLine($"path = \"{Path}\"");
         return builder.ToString();
+    }
+    
+    public override int GetHashCode()
+    {
+        return Path?.GetHashCode() ?? 0;
     }
 
     public bool Equals(SpinKeyValueStore? other)

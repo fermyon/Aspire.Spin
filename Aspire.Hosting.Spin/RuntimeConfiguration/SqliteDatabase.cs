@@ -8,7 +8,7 @@ public class SqliteDatabase : ITomlize, IEquatable<SqliteDatabase>
     {
         Path = path;
     }
-    public string Path { get; private set; }
+    public string Path { get; }
 
     public string ToToml()
     {
@@ -17,6 +17,10 @@ public class SqliteDatabase : ITomlize, IEquatable<SqliteDatabase>
         return builder.ToString();
     }
 
+    public override int GetHashCode()
+    {
+        return Path?.GetHashCode() ?? 0;
+    }
 
     public bool Equals(SqliteDatabase? other)
     {

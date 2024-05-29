@@ -14,13 +14,18 @@ public class RedisKeyValueStore : KeyValueStore, IEquatable<RedisKeyValueStore>
         Url = url;
     }
 
-    public string Url { get; private set; }
+    public string Url { get; }
 
     public override string ToToml()
     {
         var builder = new StringBuilder(base.ToToml());
         builder.AppendLine($"url = \"{Url}\"");
         return builder.ToString();
+    }
+    
+    public override int GetHashCode()
+    {
+        return Url?.GetHashCode() ?? 0;
     }
 
     public bool Equals(RedisKeyValueStore? other)

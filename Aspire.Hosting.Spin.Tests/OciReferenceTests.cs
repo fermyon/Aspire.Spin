@@ -35,7 +35,7 @@ public class OciReferenceTests
     [InlineData(null)]
     public void OciReferenceShouldNotAllowNullOrEmptyForRepository(string repository)
     {
-        var act = () => OciReference.From(repository, null);
+        var act = () => OciReference.From(repository, "some");
         act.Should().Throw<ArgumentException>();
     }
     
