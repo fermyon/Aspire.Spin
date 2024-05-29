@@ -19,6 +19,7 @@ env:
 
 jobs:
   build:
+    name: Build and Publish
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,7 +39,7 @@ jobs:
         run: echo "VERSION=${TAG#v}" >> $GITHUB_ENV
 
       - name: Build Aspire.Hosting.Spin
-        run: dotnet build --configuration Release /p:Version=$VERSION
+        run: dotnet build --configuration Release -p:Version=$VERSION
         working-directory: ./Aspire.Hosting.Spin
 
       - name: Run Tests
@@ -51,13 +52,13 @@ jobs:
           path: test-results
         if: ${{ always() }}
 
+      - name: Publish NuGet Package
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        run: dotnet nuget push ./Aspire.Hosting.Spin/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
       - name: Install .NET Aspire Workload
         run: dotnet workload install aspire
 
       - name: Build Sample Application
         run: dotnet build --configuration Release
         working-directory: ./example/host
-
-      - name: Publish NuGet Package
-        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-        run: dotnet nuget push ./Aspire.Hosting.Spin/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
