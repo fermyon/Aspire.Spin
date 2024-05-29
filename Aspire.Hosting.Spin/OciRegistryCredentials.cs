@@ -4,6 +4,9 @@ public class OciRegistryCredentials
 {
     public static OciRegistryCredentials Create(string loginServer, string user, string password)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(loginServer);
+        ArgumentException.ThrowIfNullOrWhiteSpace(user);
+        ArgumentException.ThrowIfNullOrWhiteSpace(password);
         return new OciRegistryCredentials
         {
             LoginServer = loginServer,

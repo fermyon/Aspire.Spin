@@ -29,6 +29,14 @@ jobs:
       - name: Build Aspire.Hosting.Spin
         run: dotnet build --configuration Release
         working-directory: ./Aspire.Hosting.Spin
+      - name: Run Tests
+        run: dotnet test --logger trx --results-directory "test-results"
+      - name: Upload .NET Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: test-results
+        if: ${{ always() }}
       - name: Install .NET Aspire Workload
         run: dotnet workload install aspire
       - name: Build Sample Application

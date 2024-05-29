@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Aspire.Hosting;
 
-public class RedisKeyValueStore : KeyValueStore
+public class RedisKeyValueStore : KeyValueStore, IEquatable<RedisKeyValueStore>
 {
     public RedisKeyValueStore(string url)
         : base("redis")
@@ -22,4 +22,15 @@ public class RedisKeyValueStore : KeyValueStore
         builder.AppendLine($"url = \"{Url}\"");
         return builder.ToString();
     }
+
+    public bool Equals(RedisKeyValueStore? other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+        return ReferenceEquals(this, other) || Url.Equals(other.Url);
+    }
+
+    public override bool Equals(object? obj) => Equals(obj as RedisKeyValueStore);
 }

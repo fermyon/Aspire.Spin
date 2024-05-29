@@ -6,6 +6,7 @@ public class OciReference(string repository, string tag)
 
     public static OciReference From(string repository, string tag)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(repository);
         return new OciReference(repository, tag);
     }
     

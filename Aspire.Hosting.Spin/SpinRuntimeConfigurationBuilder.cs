@@ -6,13 +6,15 @@ namespace Aspire.Hosting;
 public class SpinRuntimeConfigurationBuilder
 {
 
-    private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _keyValueStores;
+    private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _aspireKeyValueStores;
+    private IDictionary<string, string> _keyValueStores;
     private IDictionary<string, string> _sqliteDatabases;
     private string _name;
 
     private SpinRuntimeConfigurationBuilder()
     {
-        _keyValueStores = new Dictionary<string, IResourceBuilder<IResourceWithConnectionString>>();
+        _aspireKeyValueStores = new Dictionary<string, IResourceBuilder<IResourceWithConnectionString>>();
+        _keyValueStores = new Dictionary<string, string>();
         _sqliteDatabases = new Dictionary<string, string>();
     }
     public static SpinRuntimeConfigurationBuilder Create(string fileName)
@@ -25,13 +27,29 @@ public class SpinRuntimeConfigurationBuilder
     
     public SpinRuntimeConfigurationBuilder WithRedisKeyValueStore(string name, IResourceBuilder<IResourceWithConnectionString> source)
     {
-        _keyValueStores.Add(name, source);
+        if (_keyValueStores.ContainsKey(name) || !_aspireKeyValueStores.TryAdd(name, source))
+        {
+            throw new ArgumentException($"Key-Value Store {name} already configured");
+        }
+        return this;
+    }
+
+    public SpinRuntimeConfigurationBuilder WithSqliteKeyValueStore(string name, string path)
+    {
+        if (_aspireKeyValueStores.ContainsKey(name) || !_keyValueStores.TryAdd(name, path))
+        {
+            throw new ArgumentException($"Key-Value Store {name} already configured");
+        }
+
         return this;
     }
 
     public SpinRuntimeConfigurationBuilder WithSqliteDatabase(string name, string path)
     {
-        _sqliteDatabases.Add(name, path);
+        if (!_sqliteDatabases.TryAdd(name, path))
+        {
+            throw new ArgumentException($"SqliteDatabase {name} already configured");
+        }
         return this;
     }
 
@@ -39,10 +57,15 @@ public class SpinRuntimeConfigurationBuilder
     public async Task<RuntimeConfiguration> Build()
     {
         var cfg = new RuntimeConfiguration(_name);
-        foreach (var kv in _keyValueStores)
+        foreach (var kv in _aspireKeyValueStores)
         {
             var url = await kv.Value.Resource.GetValueAsync();
             cfg.KeyValueStores.Add(kv.Key, new RedisKeyValueStore(url!));
+        }
+
+        foreach (var kv in _keyValueStores)
+        {
+            cfg.KeyValueStores.Add(kv.Key, new SpinKeyValueStore(kv.Value));
         }
 
         foreach (var sqlite in _sqliteDatabases)
