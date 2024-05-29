@@ -1,16 +1,18 @@
 using System.Diagnostics;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Lifecycle;
 
 namespace Aspire.Hosting;
 
-public class InstallSpinPlugin : Lifecycle.IDistributedApplicationLifecycleHook
+public class InstallSpinPlugin : IDistributedApplicationLifecycleHook
 {
     private readonly string _pluginName;
+
     public InstallSpinPlugin(string name)
     {
         _pluginName = name;
     }
-    
+
     public async Task BeforeStartAsync(DistributedApplicationModel appModel,
         CancellationToken cancellationToken = new())
     {
@@ -21,7 +23,8 @@ public class InstallSpinPlugin : Lifecycle.IDistributedApplicationLifecycleHook
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = Constants.SpinBinary,
-                    Arguments = $"{Constants.SpinCommands.Plugins} {Constants.SpinCommands.Install} {_pluginName} {Constants.SpinFlags.Confirm}",
+                    Arguments =
+                        $"{Constants.SpinCommands.Plugins} {Constants.SpinCommands.Install} {_pluginName} {Constants.SpinFlags.Confirm}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

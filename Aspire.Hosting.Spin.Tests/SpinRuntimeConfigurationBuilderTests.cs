@@ -13,7 +13,7 @@ public class SpinRuntimeConfigurationBuilderTests
 
         mockRedis.Setup(r => r.Resource.GetValueAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync("redis://foo");
-        
+
         var sut = await SpinRuntimeConfigurationBuilder.Create("foo.yaml")
             .WithSqliteDatabase("default", "my.sqlite")
             .WithRedisKeyValueStore("foo", mockRedis.Object)
@@ -31,7 +31,7 @@ public class SpinRuntimeConfigurationBuilderTests
         sut.SqliteDatabases.Should().HaveCount(1);
         sut.SqliteDatabases.Should().Contain("default", new SqliteDatabase("custom.sqlite"));
     }
-    
+
     [Fact]
     public async Task ItShouldThrowWhenUserTriesToConfigureSqliteDatabaseTwiceWithSameName()
     {
@@ -57,7 +57,7 @@ public class SpinRuntimeConfigurationBuilderTests
         sut.KeyValueStores.Should().HaveCount(1);
         sut.KeyValueStores.Should().Contain("some", new RedisKeyValueStore("redis://some"));
     }
-    
+
     [Fact]
     public async Task ItShouldThrowWhenUserTriesToConfigureRedisKeyValueStoreTwiceWithSameName()
     {
@@ -72,11 +72,10 @@ public class SpinRuntimeConfigurationBuilderTests
         };
         await action.Should().ThrowAsync<ArgumentException>();
     }
-    
+
     [Fact]
     public async Task ItShouldThrowWhenUserTriesToConfigureSqliteKeyValueStoreTwiceWithSameName()
     {
-
         var action = async () =>
         {
             await SpinRuntimeConfigurationBuilder.Create("foo.yaml")
@@ -86,7 +85,7 @@ public class SpinRuntimeConfigurationBuilderTests
         };
         await action.Should().ThrowAsync<ArgumentException>();
     }
-    
+
     [Fact]
     public async Task ItShouldThrowWhenUserTriesToConfigureKeyValueStoresWithDuplicatedName()
     {
@@ -102,7 +101,7 @@ public class SpinRuntimeConfigurationBuilderTests
         };
         await action.Should().ThrowAsync<ArgumentException>();
     }
-    
+
     [Fact]
     public async Task ItShouldSetSqliteKeyValueStoreDetails()
     {
@@ -113,7 +112,7 @@ public class SpinRuntimeConfigurationBuilderTests
         sut.KeyValueStores.Should().HaveCount(1);
         sut.KeyValueStores.Should().Contain("some", new SpinKeyValueStore("kv.sqlite"));
     }
-    
+
     [Fact]
     public async Task ItShouldSetMultipleKeyValueStoreDetails()
     {

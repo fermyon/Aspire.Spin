@@ -1,16 +1,18 @@
 using System.Diagnostics;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Lifecycle;
 
 namespace Aspire.Hosting;
 
-public class SpinRegistryLogin: Lifecycle.IDistributedApplicationLifecycleHook {
+public class SpinRegistryLogin : IDistributedApplicationLifecycleHook
+{
     private readonly OciRegistryCredentials _creds;
 
     public SpinRegistryLogin(OciRegistryCredentials creds)
     {
         _creds = creds;
     }
-    
+
     public async Task BeforeStartAsync(DistributedApplicationModel appModel,
         CancellationToken cancellationToken = new())
     {
@@ -21,7 +23,8 @@ public class SpinRegistryLogin: Lifecycle.IDistributedApplicationLifecycleHook {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = Constants.SpinBinary,
-                    Arguments = $"{Constants.SpinCommands.Registry} {Constants.SpinCommands.Login} {_creds.LoginServer} -u {_creds.User} -p {_creds.Password}",
+                    Arguments =
+                        $"{Constants.SpinCommands.Registry} {Constants.SpinCommands.Login} {_creds.LoginServer} -u {_creds.User} -p {_creds.Password}",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,

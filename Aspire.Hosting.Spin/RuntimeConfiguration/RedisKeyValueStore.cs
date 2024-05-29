@@ -7,14 +7,17 @@ public class RedisKeyValueStore : KeyValueStore, IEquatable<RedisKeyValueStore>
     public RedisKeyValueStore(string url)
         : base("redis")
     {
-        if (!url.StartsWith("redis://"))
-        {
-            url = $"redis://{url}";
-        }
+        if (!url.StartsWith("redis://")) url = $"redis://{url}";
         Url = url;
     }
 
     public string Url { get; }
+
+    public bool Equals(RedisKeyValueStore? other)
+    {
+        if (other == null) return false;
+        return ReferenceEquals(this, other) || Url.Equals(other.Url);
+    }
 
     public override string ToToml()
     {
@@ -22,20 +25,14 @@ public class RedisKeyValueStore : KeyValueStore, IEquatable<RedisKeyValueStore>
         builder.AppendLine($"url = \"{Url}\"");
         return builder.ToString();
     }
-    
+
     public override int GetHashCode()
     {
         return Url?.GetHashCode() ?? 0;
     }
 
-    public bool Equals(RedisKeyValueStore? other)
+    public override bool Equals(object? obj)
     {
-        if (other == null)
-        {
-            return false;
-        }
-        return ReferenceEquals(this, other) || Url.Equals(other.Url);
+        return Equals(obj as RedisKeyValueStore);
     }
-
-    public override bool Equals(object? obj) => Equals(obj as RedisKeyValueStore);
 }

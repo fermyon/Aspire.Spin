@@ -1,16 +1,13 @@
-using System.Runtime.CompilerServices;
 using System.Text;
-using YamlDotNet.Core.Tokens;
 
 namespace Aspire.Hosting;
 
 // hack: simple dump of runtime configuration
 public class RuntimeConfiguration : ITomlize
 {
-    
     internal RuntimeConfiguration(string name)
     {
-        Name  = name;
+        Name = name;
         KeyValueStores = new Dictionary<string, KeyValueStore>();
         SqliteDatabases = new Dictionary<string, SqliteDatabase>();
     }
@@ -20,6 +17,7 @@ public class RuntimeConfiguration : ITomlize
     public IDictionary<string, SqliteDatabase> SqliteDatabases { get; set; }
 
     public string Name { get; private set; }
+
     public string ToToml()
     {
         var builder = new StringBuilder();
@@ -32,10 +30,8 @@ public class RuntimeConfiguration : ITomlize
 
         foreach (var sqlite in SqliteDatabases)
         {
-            {
-                builder.AppendLine($"[sqlite_database.{sqlite.Key}]");
-                builder.AppendLine(sqlite.Value.ToToml());
-            }
+            builder.AppendLine($"[sqlite_database.{sqlite.Key}]");
+            builder.AppendLine(sqlite.Value.ToToml());
         }
 
         return builder.ToString();

@@ -5,11 +5,14 @@ on:
   push:
     branches:
       - "main"
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
   pull_request:
     branches:
       - "main"
 
 env:
+  VERSION: 0.0.1
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
   NuGetDirectory: ${{ github.workspace}}/nuget
@@ -22,23 +25,39 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
+
+      - name: Set Version Variable
+        if: ${{ github.ref_type == 'tag' }}
+        env:
+          TAG: ${{ github.ref_name }}
+        run: echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+
       - name: Build Aspire.Hosting.Spin
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release /p:Version=$VERSION
         working-directory: ./Aspire.Hosting.Spin
+
       - name: Run Tests
         run: dotnet test --logger trx --results-directory "test-results"
-      - name: Upload .NET Test Results
+
+      - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: dotnet-test-results
           path: test-results
         if: ${{ always() }}
+
       - name: Install .NET Aspire Workload
         run: dotnet workload install aspire
+
       - name: Build Sample Application
         run: dotnet build --configuration Release
         working-directory: ./example/host
+
+      - name: Publish NuGet Package
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        run: dotnet nuget push ./Aspire.Hosting.Spin/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json

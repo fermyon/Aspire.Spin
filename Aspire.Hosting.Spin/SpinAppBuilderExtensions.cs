@@ -4,22 +4,23 @@ namespace Aspire.Hosting;
 
 public static class SpinAppBuilderExtensions
 {
-
-    private static IResourceBuilder<SpinAppResource> BuildSpinAppResource(this IDistributedApplicationBuilder builder, string name, string workingDirectory,
+    private static IResourceBuilder<SpinAppResource> BuildSpinAppResource(this IDistributedApplicationBuilder builder,
+        string name, string workingDirectory,
         int port, string[] args)
     {
         var resource = new SpinAppResource(name, workingDirectory);
-        
+
         return builder.AddResource(resource)
-            .WithEndpoint(port: port, targetPort: port, scheme: "http", isProxied: false)
+            .WithEndpoint(port, port, "http", isProxied: false)
             .WithUp()
             .WithSpinDefaults()
             .WithArgs(args);
     }
-    
-    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name, string workingDirectory, int port = 3000)
+
+    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name,
+        string workingDirectory, int port = 3000)
     {
-        string[] effectiveArgs = BuildListenArgs(port);
+        var effectiveArgs = BuildListenArgs(port);
         workingDirectory = Path.Combine(builder.AppHostDirectory, workingDirectory);
         return builder.BuildSpinAppResource(name, workingDirectory, port, effectiveArgs);
     }
@@ -29,14 +30,15 @@ public static class SpinAppBuilderExtensions
         return [Constants.SpinFlags.Listen, $"127.0.0.1:{port}"];
     }
 
-    private static String[] BuildOciArgs(OciReference oci)
+    private static string[] BuildOciArgs(OciReference oci)
     {
         return [Constants.SpinFlags.From, oci.ToString()];
     }
-    
-    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name, OciReference oci, int port = 3000)
+
+    public static IResourceBuilder<SpinAppResource> AddSpinApp(this IDistributedApplicationBuilder builder, string name,
+        OciReference oci, int port = 3000)
     {
-        string[] args = BuildListenArgs(port).Concat(BuildOciArgs(oci)).ToArray();
+        var args = BuildListenArgs(port).Concat(BuildOciArgs(oci)).ToArray();
         return builder.BuildSpinAppResource(name, string.Empty, port, args);
     }
 
@@ -48,41 +50,39 @@ public static class SpinAppBuilderExtensions
     public static IResourceBuilder<SpinAppResource> WithSpinEnvironment(this IResourceBuilder<SpinAppResource> builder,
         IDictionary<string, string> vars)
     {
-        vars.Keys.ToList().ForEach(key =>
-        {
-            builder.WithSpinEnvironment(key, vars[key]);
-        });
+        vars.Keys.ToList().ForEach(key => { builder.WithSpinEnvironment(key, vars[key]); });
         return builder;
     }
-    
-    public static IResourceBuilder<SpinAppResource> WithSpinEnvironment(this IResourceBuilder<SpinAppResource> builder, string name, string value)
+
+    public static IResourceBuilder<SpinAppResource> WithSpinEnvironment(this IResourceBuilder<SpinAppResource> builder,
+        string name, string value)
     {
         return builder.WithEnvironment(Constants.SpinVariablePrefix + name, value);
     }
-    
-    public static IResourceBuilder<SpinAppResource> WithReference(this IResourceBuilder<SpinAppResource> builder, IResourceBuilder<IResourceWithConnectionString> source, string? connectionName = null, bool optional = false)
+
+    public static IResourceBuilder<SpinAppResource> WithReference(this IResourceBuilder<SpinAppResource> builder,
+        IResourceBuilder<IResourceWithConnectionString> source, string? connectionName = null, bool optional = false)
     {
         var name = connectionName;
-        IResourceWithConnectionString resource = source.Resource;
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            name = resource.Name;
-        }
+        var resource = source.Resource;
+        if (string.IsNullOrWhiteSpace(name)) name = resource.Name;
 
-        return builder.WithEnvironment(delegate (EnvironmentCallbackContext context)
+        return builder.WithEnvironment(delegate(EnvironmentCallbackContext context)
         {
-            var key = resource.ConnectionStringEnvironmentVariable ?? (Constants.SpinVariablePrefix + "ConnectionStrings__" + name);
+            var key = resource.ConnectionStringEnvironmentVariable ??
+                      Constants.SpinVariablePrefix + "ConnectionStrings__" + name;
             context.EnvironmentVariables[key] = new ConnectionStringReference(resource, optional);
         });
     }
 
-    public static IResourceBuilder<SpinAppResource> WithRuntimeConfig(this IResourceBuilder<SpinAppResource> builder, SpinRuntimeConfigurationBuilder spinRuntimeConfigBuilder)
+    public static IResourceBuilder<SpinAppResource> WithRuntimeConfig(this IResourceBuilder<SpinAppResource> builder,
+        SpinRuntimeConfigurationBuilder spinRuntimeConfigBuilder)
     {
-        
-        return builder.WithArgs(async (ctx) =>
+        return builder.WithArgs(async ctx =>
         {
             var config = await spinRuntimeConfigBuilder.Build();
-            var runtimeConfigFile = Path.Combine(builder.ApplicationBuilder.AppHostDirectory, builder.Resource.WorkingDirectory, config.Name);
+            var runtimeConfigFile = Path.Combine(builder.ApplicationBuilder.AppHostDirectory,
+                builder.Resource.WorkingDirectory, config.Name);
             await File.WriteAllTextAsync(runtimeConfigFile, config.ToToml());
             ctx.Args.Add(Constants.SpinFlags.RuntimeConfigFile);
             ctx.Args.Add(runtimeConfigFile);
@@ -93,7 +93,6 @@ public static class SpinAppBuilderExtensions
     {
         return builder
             .WithArgs(Constants.SpinFlags.Build);
-            
     }
 
     public static IResourceBuilder<SpinAppResource> WithSqlMigration(this IResourceBuilder<SpinAppResource> builder,
@@ -103,7 +102,8 @@ public static class SpinAppBuilderExtensions
             .WithArgs(Constants.SpinFlags.SqlLite, migration);
     }
 
-    public static IResourceBuilder<SpinAppResource> WithTlsCertificate(this IResourceBuilder<SpinAppResource> builder, string certPath, string keyPath)
+    public static IResourceBuilder<SpinAppResource> WithTlsCertificate(this IResourceBuilder<SpinAppResource> builder,
+        string certPath, string keyPath)
     {
         return builder
             .WithArgs(Constants.SpinFlags.TlsCert, certPath)

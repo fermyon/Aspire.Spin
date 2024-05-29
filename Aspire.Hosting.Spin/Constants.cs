@@ -4,6 +4,7 @@ public class Constants
 {
     public const string SpinBinary = "spin";
     public const string SpinVariablePrefix = "SPIN_VARIABLE_";
+
     public static class SpinCommands
     {
         public const string Up = "up";
@@ -25,6 +26,5 @@ public class Constants
         public const string Version = "--version";
         public const string Listen = "--listen";
         public const string Confirm = "--yes";
-
     }
 }

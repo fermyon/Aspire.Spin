@@ -1,15 +1,13 @@
 using Aspire.Hosting.ApplicationModel;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Aspire.Hosting;
 
 public class SpinRuntimeConfigurationBuilder
 {
-
-    private IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _aspireKeyValueStores;
-    private IDictionary<string, string> _keyValueStores;
-    private IDictionary<string, string> _sqliteDatabases;
+    private readonly IDictionary<string, IResourceBuilder<IResourceWithConnectionString>> _aspireKeyValueStores;
+    private readonly IDictionary<string, string> _keyValueStores;
     private string _name = null!;
+    private readonly IDictionary<string, string> _sqliteDatabases;
 
     private SpinRuntimeConfigurationBuilder()
     {
@@ -17,29 +15,27 @@ public class SpinRuntimeConfigurationBuilder
         _keyValueStores = new Dictionary<string, string>();
         _sqliteDatabases = new Dictionary<string, string>();
     }
+
     public static SpinRuntimeConfigurationBuilder Create(string fileName)
     {
-        return new SpinRuntimeConfigurationBuilder()
+        return new SpinRuntimeConfigurationBuilder
         {
             _name = fileName
         };
     }
-    
-    public SpinRuntimeConfigurationBuilder WithRedisKeyValueStore(string name, IResourceBuilder<IResourceWithConnectionString> source)
+
+    public SpinRuntimeConfigurationBuilder WithRedisKeyValueStore(string name,
+        IResourceBuilder<IResourceWithConnectionString> source)
     {
         if (_keyValueStores.ContainsKey(name) || !_aspireKeyValueStores.TryAdd(name, source))
-        {
             throw new ArgumentException($"Key-Value Store {name} already configured");
-        }
         return this;
     }
 
     public SpinRuntimeConfigurationBuilder WithSqliteKeyValueStore(string name, string path)
     {
         if (_aspireKeyValueStores.ContainsKey(name) || !_keyValueStores.TryAdd(name, path))
-        {
             throw new ArgumentException($"Key-Value Store {name} already configured");
-        }
 
         return this;
     }
@@ -47,9 +43,7 @@ public class SpinRuntimeConfigurationBuilder
     public SpinRuntimeConfigurationBuilder WithSqliteDatabase(string name, string path)
     {
         if (!_sqliteDatabases.TryAdd(name, path))
-        {
             throw new ArgumentException($"SqliteDatabase {name} already configured");
-        }
         return this;
     }
 
@@ -63,15 +57,9 @@ public class SpinRuntimeConfigurationBuilder
             cfg.KeyValueStores.Add(kv.Key, new RedisKeyValueStore(url!));
         }
 
-        foreach (var kv in _keyValueStores)
-        {
-            cfg.KeyValueStores.Add(kv.Key, new SpinKeyValueStore(kv.Value));
-        }
+        foreach (var kv in _keyValueStores) cfg.KeyValueStores.Add(kv.Key, new SpinKeyValueStore(kv.Value));
 
-        foreach (var sqlite in _sqliteDatabases)
-        {
-            cfg.SqliteDatabases.Add(sqlite.Key, new SqliteDatabase(sqlite.Value));
-        }
+        foreach (var sqlite in _sqliteDatabases) cfg.SqliteDatabases.Add(sqlite.Key, new SqliteDatabase(sqlite.Value));
         return cfg;
     }
 }

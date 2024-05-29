@@ -1,7 +1,30 @@
-# .NET Aspire Spin integration
+# Aspire.Hosting.Spin
 
-This is an experimental project to add support for Spin application in the .NET Aspire framework. The project is under development, so no guarantees of stability or compatibility can be expected - but we still hope you think it's great!
+`Aspire.Hosting.Spin` adds support for [Spin](https://developer.fermyon.com/spin) to [.NET Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/build-your-first-aspire-app). 
 
-You can follow the [Aspire Quickstart](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/build-your-first-aspire-app) and start adding Spin services by building and referencing the [Aspire.Hosting.Spin](./Aspire.Hosting.Spin/) project.
+The project is under active development, so no guarantees of stability or compatibility can be expected - but we still hope you think it's great!
 
-Also, check out the [example](./example/).
+## Installation
+
+```bash
+# Add Aspire.Hosting.Spin to your .NET Aspire project
+dotnet add package Aspire.Hosting.Spin
+```
+
+### Basic Usage
+
+`Aspire.Hosting.Spin` contributes extensions to the `Aspire.Hosting` namespace. Adding an existing Spin App to your `DistributedApplicationBuilder` is as simple as calling `AddSpinApp`:
+
+```csharp
+var builder = DistributedApplication.CreateBuilder(args);
+
+builder.AddSpinApp("api-one", "../api-one", 3001)
+    .WithOtlpExporter();
+builder.Build().Run();
+```
+
+
+
+### Further Samples
+
+Check out the [example](./example/) folder, it contains a basic sample illustrating how you can design a distributed application using multiple Spin Apps

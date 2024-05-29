@@ -15,10 +15,10 @@ public class AzureCosmosDbKeyValueStore : KeyValueStore
         Container = container;
     }
 
-    public string Key { get; private set; }
-    public string Account { get; private set; }
-    public string Database { get; private set; }
-    public string Container { get; private set; }
+    public string Key { get; }
+    public string Account { get; }
+    public string Database { get; }
+    public string Container { get; }
 
     public override string ToToml()
     {

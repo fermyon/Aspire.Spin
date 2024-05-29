@@ -8,7 +8,14 @@ public class SqliteDatabase : ITomlize, IEquatable<SqliteDatabase>
     {
         Path = path;
     }
+
     public string Path { get; }
+
+    public bool Equals(SqliteDatabase? other)
+    {
+        if (other == null) return false;
+        return ReferenceEquals(this, other) || Path.Equals(other.Path);
+    }
 
     public string ToToml()
     {
@@ -22,14 +29,8 @@ public class SqliteDatabase : ITomlize, IEquatable<SqliteDatabase>
         return Path?.GetHashCode() ?? 0;
     }
 
-    public bool Equals(SqliteDatabase? other)
+    public override bool Equals(object? obj)
     {
-        if (other == null)
-        {
-            return false;
-        }
-        return ReferenceEquals(this, other) || Path.Equals(other.Path);
+        return Equals(obj as SqliteDatabase);
     }
-
-    public override bool Equals(object? obj) => Equals(obj as SqliteDatabase);
 }

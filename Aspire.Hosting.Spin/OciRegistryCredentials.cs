@@ -2,6 +2,10 @@ namespace Aspire.Hosting;
 
 public class OciRegistryCredentials
 {
+    public required string LoginServer { get; init; }
+    public required string User { get; init; }
+    public required string Password { get; init; }
+
     public static OciRegistryCredentials Create(string loginServer, string user, string password)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(loginServer);
@@ -14,7 +18,4 @@ public class OciRegistryCredentials
             Password = password
         };
     }
-    public required string LoginServer { get; init; }
-    public required string User { get; init; }
-    public required string Password { get; init; } 
 }

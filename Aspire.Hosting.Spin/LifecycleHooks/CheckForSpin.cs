@@ -1,9 +1,10 @@
 using System.Diagnostics;
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Lifecycle;
 
 namespace Aspire.Hosting;
 
-public class CheckForSpin : Lifecycle.IDistributedApplicationLifecycleHook
+public class CheckForSpin : IDistributedApplicationLifecycleHook
 {
     public async Task BeforeStartAsync(DistributedApplicationModel appModel,
         CancellationToken cancellationToken = new())

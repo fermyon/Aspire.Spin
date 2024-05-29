@@ -4,13 +4,13 @@ namespace Aspire.Hosting;
 
 public abstract class KeyValueStore : ITomlize
 {
-
     public KeyValueStore(string type)
     {
         Type = type;
     }
 
-    public string Type { get; private set; }
+    public string Type { get; }
+
     public virtual string ToToml()
     {
         var res = new StringBuilder();
