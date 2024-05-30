@@ -8,6 +8,8 @@ public class SpinRuntimeConfigurationBuilder
     private readonly IDictionary<string, string> _keyValueStores;
     private string _name = null!;
     private readonly IDictionary<string, string> _sqliteDatabases;
+    private string _llmUrl;
+    private string _llmToken;
 
     private SpinRuntimeConfigurationBuilder()
     {
@@ -47,6 +49,14 @@ public class SpinRuntimeConfigurationBuilder
         return this;
     }
 
+    public SpinRuntimeConfigurationBuilder WithLLM(string url, string token)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(url);
+        ArgumentException.ThrowIfNullOrWhiteSpace(token);
+        _llmUrl = url;
+        _llmToken = token;
+        return this;
+    }
 
     public async Task<RuntimeConfiguration> Build()
     {
@@ -60,6 +70,11 @@ public class SpinRuntimeConfigurationBuilder
         foreach (var kv in _keyValueStores) cfg.KeyValueStores.Add(kv.Key, new SpinKeyValueStore(kv.Value));
 
         foreach (var sqlite in _sqliteDatabases) cfg.SqliteDatabases.Add(sqlite.Key, new SqliteDatabase(sqlite.Value));
+        
+        if (!string.IsNullOrWhiteSpace(_llmUrl))
+        {
+            cfg.LLMCompute = new LargeLanguageModelCompute(_llmUrl, _llmToken);
+        }
         return cfg;
     }
 }

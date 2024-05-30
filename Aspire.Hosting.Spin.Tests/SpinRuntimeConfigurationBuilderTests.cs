@@ -140,4 +140,26 @@ public class SpinRuntimeConfigurationBuilderTests
             .Build();
         actual.Name.Should().Be(name);
     }
+
+    [Theory]
+    [InlineData("", "")]
+    [InlineData(" ", " ")]
+    [InlineData(null, null)]
+    [InlineData("https://some.url", "")]
+    [InlineData("https://some.url", null)]
+    [InlineData("https://some.url", " ")]
+    [InlineData("", "sdfsf")]
+    [InlineData(" ", "sdfsf")]
+    [InlineData(null, "sdfsf")]
+    
+    public async Task ItShouldThrowWhenLLMConfigurationIsProvidedNullOrEmpty(string url, string token)
+    {
+        var action = async () =>
+        {
+            await SpinRuntimeConfigurationBuilder.Create("foo.yaml")
+                .WithLLM(url, token)
+                .Build();
+        };
+        await action.Should().ThrowAsync<ArgumentException>();
+    }
 }
